@@ -46,7 +46,7 @@ CREATE TABLE `account_user` (
 -- ----------------------------
 -- Records of account_user
 -- ----------------------------
-INSERT INTO `account_user` VALUES ('1', 'pbkdf2_sha256$100000$OLDhGMw3geoz$qkNJ5sJcIAae0Y4CowwUaDHD7E/6Us5kYPrmhQ2/CSg=', null, '1', 'admin', '', '', 'admin@domain.com', '1', '1', '2018-12-13 11:48:45.010683', 'developer', '', null, null);
+INSERT INTO `account_user` VALUES ('1', 'pbkdf2_sha256$100000$5Oliso5xVqwi$Og7vefujUvX0lAjltw2GyyON4/ipYrMcPCJ3yUBCIxk=', null, '1', 'admin', '', '', 'admin@domain.com', '1', '1', '2018-12-13 11:48:45.010683', 'developer', '', null, null);
 
 -- ----------------------------
 -- Table structure for `account_user_groups`
