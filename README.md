@@ -19,8 +19,11 @@
         -v /data/sqldata/www:/usr/local/seevenv/see-master
         -v /data/sqldata/inception/inc.cnf:/etc/inc.cnf
         --name mysqldocker sql:latest "/etc/rc.local"` 
-  - 注意事项
-      - `注意：上面的路径要替换成你的实际路径`
+ - php文件
+    - `php项目是拉取阿里云rds的服务项目，使用yii2框架的console写的，可以实时拉取慢查询`
+    - `拉取慢查询入库后，see服务端已经做好数据展示和工单流程，记得要修改PHP项目的mysql，数据库依然是你是sqlweb`
+ - 注意事项
+    - `注意：上面的路径要替换成你的实际路径`
 
 ## 功能简介
 
