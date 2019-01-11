@@ -12,7 +12,7 @@
     进入docker目录
     docker build -t  sql:latest .
 ### 使用
-    docker run -idt  -p 80:80 -v /data/sqldata/nginx/www.conf:/usr/local/nginx/conf/vhosts/www.conf -v /data/www/web:/usr/local/seevenv/see-master -v /data/sqldata/inception/inc.cnf:/etc/inc.cnf --name mysqldocker sql:latest '/etc/rc.local'
+    docker run -idt  -p 80:80 -v /data/sqldata/nginx/www.conf:/usr/local/nginx/conf/vhosts/www.conf -v /data/sqldata/www:/usr/local/seevenv/see-master -v /data/sqldata/inception/inc.cnf:/etc/inc.cnf --name mysqldocker sql:latest '/etc/rc.local'
     注意：上面的路径要替换成你的实际路径
 
 ## 功能简介
