@@ -12,8 +12,11 @@
     进入docker目录
     docker build -t  sql:latest .
 ### 使用
-    <font color='red'>在docker启动之前一定先的导入sql文件夹里sqlweb.sql,然后修改sqldata/www/backend/sqlweb/setting.py里修改mysql连接</front>
-    docker run -idt  -p 80:80 -v /data/sqldata/nginx/www.conf:/usr/local/nginx/conf/vhosts/www.conf -v /data/sqldata/www:/usr/local/seevenv/see-master -v /data/sqldata/inception/inc.cnf:/etc/inc.cnf --name mysqldocker sql:latest '/etc/rc.local'
+        在docker启动之前一定先的导入sql文件夹里sqlweb.sql,然后修改sqldata/www/backend/sqlweb/setting.py里修改mysql连接
+    docker run -idt  -p 80:80 -v /data/sqldata/nginx/www.conf:/usr/local/nginx/conf/vhosts/www.conf \
+    -v /data/sqldata/www:/usr/local/seevenv/see-master \
+    -v /data/sqldata/inception/inc.cnf:/etc/inc.cnf \
+    --name mysqldocker sql:latest '/etc/rc.local'
     注意：上面的路径要替换成你的实际路径
 
 ## 功能简介
