@@ -922,11 +922,9 @@ CREATE TABLE `slowquery_slowlog` (
 
 -- ----------------------------
 -- Records of slowquery_slowlog
--- ----------------------------
-
-- ----------------------------
 -- Table structure for `slowquery_slowlogcomment`
 -- ----------------------------
+DROP TABLE IF EXISTS `slowquery_slowlogcomment`;
 CREATE TABLE `slowquery_slowlogcomment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `slowid` int(11) DEFAULT NULL,
@@ -943,6 +941,7 @@ CREATE TABLE `slowquery_slowlogcomment` (
 -- ----------------------------
 -- Table structure for `slowquery_slowlogorder`
 -- ----------------------------
+DROP TABLE IF EXISTS `slowquery_slowlogorder`;
 CREATE TABLE `slowquery_slowlogorder` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `MySQLTotalExecutionCounts` int(30) NOT NULL,
