@@ -4,9 +4,27 @@ export function getSqlContent (sqlContent) {
     sqlContent = []
     sqlContentList.map( (item) => {
       if (item.length > 2) {
-        sqlContent.push({
-          value:item + ';',
+        var sqltmp = item.split("\n")
+        if(sqltmp.length>0){
+          for ( var i = 0; i <sqltmp.length; i++){
+            if(sqltmp[i].indexOf('#')>-1){
+              sqlContent.push({
+                  value:sqltmp[i],
+              })
+            }else{
+              if(sqltmp[i].replace(/(^\s*)|(\s*$)/g, "") != ''){
+                  sqlContent.push({
+                    value:sqltmp[i] + ';',
+                })
+              }
+            }
+          }
+        }else{
+          sqlContent.push({
+            value:item + ';',
         })
+        }
+        
       }
     })
     return sqlContent
