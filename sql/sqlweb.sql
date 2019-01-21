@@ -985,3 +985,6 @@ CREATE TABLE `slowquery_slowrecord` (
 -- ----------------------------
 -- Records of slowquery_slowrecord
 -- ----------------------------
+ALTER TABLE slowquery_slowlog ADD slow_status int(1) DEFAULT 0 COMMENT '转工单状态';
+ALTER TABLE account_user ADD phone varchar(20) DEFAULT '' COMMENT '手机号';
+ALTER TABLE slowquery_slowrecord MODIFY COLUMN SQLId varchar(50) DEFAULT ''; 
