@@ -10,8 +10,8 @@ namespace console\controllers;
 
 use console\models\slowquery_slowlog;
 use console\models\slowquery_slowrecord;
-use console\Base\SeeapiService;
-use console\Base\SlowlogService;
+use SqlAudit\Base\SeeapiService;
+use SqlAudit\Base\SlowlogService;
 use yii;
 
 class IndexController extends \yii\console\Controller
@@ -26,6 +26,7 @@ class IndexController extends \yii\console\Controller
                   'log'   =>'SQLSlowRecord'
               ]
     ];
+    private $sql_id_arr;
     private function sortKeyData($fields,$data){
         $result = [];
         foreach ($fields as $v) {
@@ -38,7 +39,7 @@ class IndexController extends \yii\console\Controller
         return $result;
     }
 
-    private function composeInsertData(&$data,$slowtype){
+    private function composeInsertData(&$data,$slowtype,$slowlog='',$startstr='',$endstr='',$sqlids = ''){
         $sql_id_data=[];
         $fields_slowlog=(new $this->slow_map[$slowtype]['class'])->attributes();
         $fields_slowlog && array_shift($fields_slowlog);
@@ -46,13 +47,15 @@ class IndexController extends \yii\console\Controller
             foreach ($data as &$v) {
                 if ($slowtype=='DescribeSlowLogs'){
                     $v['CreateTime'] = date('Y-m-d',strtotime($v['CreateTime']));
+                    $sqlid[] = $v['SQLIdStr'] = $v['SQLHASH'];
+                    $v['slow_status'] = 0;
+                    unset($v['SQLHASH']);
                     $data_tmp[] = $this->sortKeyData($fields_slowlog,$v);
-                    $sqlid[] = $v['SQLId'];
                 }else{
                     $timetmp = strtotime($v['ExecutionStartTime']);
                     $v['ExecutionStartTime'] = date('Y-m-d H:i:s',$timetmp);
-                    $data_tmp[]=array_merge(['SQLId' => $timetmp],$this->sortKeyData($fields_slowlog,$v));
-                    $sqlid[] = $timetmp;
+                    $data_tmp[]=array_merge(['SQLId' => $sqlids],$this->sortKeyData($fields_slowlog,$v));
+                    $sqlid[] = $sqlids;
                 }    
             }
        }
@@ -63,8 +66,16 @@ class IndexController extends \yii\console\Controller
         if(isset($sqlid_diff)){
             foreach ($sqlid_diff as $m => $n) {
                 foreach ($data_tmp as $vv) {
-                    if($n==$vv['SQLId']){
-                        $sql_id_data[]=$vv;
+                	if ($slowtype=='DescribeSlowLogs'){
+                		if($n==$vv['SQLIdStr']){
+                        	$sql_id_data[]=$vv;
+                        	$this->sql_id_arr[]=$vv['SQLIdStr'];
+                        	//$this->Record($slowlog,$vv['SQLIdStr'],$startstr,$endstr);
+                    	}
+                    }else{
+                    	if($n==$vv['SQLId']){
+                        	$sql_id_data[]=$vv;
+                    	}
                     }
                 }
             }
@@ -72,29 +83,88 @@ class IndexController extends \yii\console\Controller
        return $sql_id_data;
     }
 
-    private function batchInsert($slowlog,$startstr,$endstr,$data,$slowtype){
-       $data && $insertData = $this->composeInsertData($data,$slowtype);
+    private function batchInsert($slowlog,$startstr,$endstr,$data,$slowtype,$sqlid = ''){
+       $data && $insertData = $this->composeInsertData($data,$slowtype,$slowlog,$startstr,$endstr,$sqlid);
         isset($insertData) && $insertData && $this->slow_map[$slowtype]['class']::batchInsert($insertData);
     }
 
     private function pageData($Page,$PageSize,$startstr,$endstr,$slowlog,$slowtype='DescribeSlowLogs'){
-        $result = json_decode($slowlog->setAction($slowtype)->setStartTime($startstr)->setEndTime($endstr)->setPageSize($PageSize)->setPageNumber($Page)->composeData(),true);
-        if(isset($result['Items'][$this->slow_map[$slowtype]['log']])){
-            echo $this->slow_map[$slowtype]['log'].'在第'.$Page.'页获取总条数为：'.count($result['Items'][$this->slow_map[$slowtype]['log']]).'条!'.PHP_EOL;
+    	$taskUrl = $slowlog->setAction($slowtype)->setStartTime($startstr)->setEndTime($endstr)->setPageSize($PageSize)->setPageNumber($Page)->composeData();
+    	$result =$this->formatData($slowlog->addTask($taskUrl)->run(),$slowtype);
+        if(isset($result['data'])){
+            echo $this->slow_map[$slowtype]['log'].'在第'.$Page.'页获取总条数为：'.count($result['data']).'条!'.PHP_EOL;
         }
-        isset($result['Items'][$this->slow_map[$slowtype]['log']]) && $result['Items'][$this->slow_map[$slowtype]['log']] && $this->batchInsert($slowlog,$startstr,$endstr,$result['Items'][$this->slow_map[$slowtype]['log']],$slowtype);
+        isset($result['data']) && $result['data'] && $this->batchInsert($slowlog,$startstr,$endstr,$result['data'],$slowtype);
         return $result;
     }
 
-    public function actionRecord($startstr='',$endstr=''){
-       $slowlog = new SlowlogService;
+     private function formatData($data,$slowtype='DescribeSlowLogs',$sqlid=''){
+     	$result = [];
+    	if($data){
+    		if($slowtype == 'DescribeSlowLogs'){
+    			foreach ($data as &$v) {
+	    			if(!is_array($v)){
+	    				$v = json_decode($v,true);
+	    				if(!empty($v['Items'][$this->slow_map[$slowtype]['log']])){
+	    					foreach ($v['Items'][$this->slow_map[$slowtype]['log']] as $m) {
+	    						$result['data'][] = $m;
+	    					}
+	    					$result['PageNumber'] = $v['PageNumber'];
+	    					$result['TotalRecordCount'] = $v['TotalRecordCount'];
+	    					$result['PageRecordCount'] = $v['PageRecordCount'];
+	    				}
+	    			}
+    			}
+    		}else if(!empty($data[$sqlid]) && $sqlid){
+    			foreach ($data[$sqlid] as &$v) {
+	    			if(!is_array($v)){
+	    				$v = json_decode($v,true);
+	    				if(!empty($v['Items'][$this->slow_map[$slowtype]['log']])){
+	    					foreach ($v['Items'][$this->slow_map[$slowtype]['log']] as $m) {
+	    						$result['data'][] = $m;
+	    					}
+	    					$result['PageNumber'] = $v['PageNumber'];
+	    					$result['TotalRecordCount'] = $v['TotalRecordCount'];
+	    					$result['PageRecordCount'] = $v['PageRecordCount'];
+	    				}
+	    			}
+    			}
+    		}
+    		
+    	}
+    	return $result;
+    }
+
+    private function pageRecordDataIN($Page,$PageSize,$startstr,$endstr,$slowlog,$slowtype='DescribeSlowLogRecords',$sqlid){
+    	$taskUrl = $slowlog->setAction($slowtype)->setStartTime($startstr)->setEndTime($endstr)->setPageSize($PageSize)->setPageNumber($Page)->setSQLId($sqlid)->composeData();
+    	$slowlog->addTask($taskUrl);
+    }
+
+    private function pageDataIN($Page,$PageSize,$startstr,$endstr,$slowlog,$slowtype='DescribeSlowLogs'){
+    	$taskUrl = $slowlog->setAction($slowtype)->setStartTime($startstr)->setEndTime($endstr)->setPageSize($PageSize)->setPageNumber($Page)->composeData();
+    	$slowlog->addTask($taskUrl);
+    }
+
+    private function pageRecordData($Page,$PageSize,$startstr,$endstr,$slowlog,$slowtype='DescribeSlowLogRecords',$sqlid){
+       $taskUrl = $slowlog->setAction($slowtype)->setStartTime($startstr)->setEndTime($endstr)->setPageSize($PageSize)->setPageNumber($Page)->setSQLId($sqlid)->composeData();
+    	$result =$this->formatData($slowlog->addTaskId($taskUrl,$sqlid)->run(),$slowtype,$sqlid);
+        if(isset($result['data'])){
+            echo $this->slow_map[$slowtype]['log'].'在第'.$Page.'页获取总条数为：'.count($result['data']).'条!'.PHP_EOL;
+        }
+        isset($result['data']) && $result['data'] && $this->batchInsert($slowlog,$startstr,$endstr,$result['data'],$slowtype,$sqlid);
+        return $result;
+    }
+
+
+
+    public function Record($slowlog,$sqlid,$startstr='',$endstr=''){
        if($startstr=='' && $endstr==''){
           $startstr = date("Y-m-d");
           $endstr = date("Y-m-d",strtotime("+1 day"));
        }
        $Page = 1;
        $PageSize =100;
-       $result = $this->pageData($Page,$PageSize,$startstr,$endstr,$slowlog,'DescribeSlowLogRecords');
+       $result = $this->pageRecordData($Page,$PageSize,$startstr,$endstr,$slowlog,'DescribeSlowLogRecords',$sqlid);
        if(isset($result['TotalRecordCount']) && $result['TotalRecordCount']>($Page * $PageSize)){
             $page_total=ceil($result['TotalRecordCount']/$result['PageRecordCount']);
             echo 'slowlogRecord开始执行 '.date('Y-m-d H:i:s').'!'.PHP_EOL;
@@ -103,11 +173,27 @@ class IndexController extends \yii\console\Controller
             for ($i=0; $i <$page_total-1; $i++) { 
                 $Page++;
                 echo 'slowlogRecord获取第'.$Page.'页成功!'.PHP_EOL;
-                $this->pageData($Page,$PageSize,$startstr,$endstr,$slowlog,'DescribeSlowLogRecords');
+                $this->pageRecordDataIN($Page,$PageSize,$startstr,$endstr,$slowlog,'DescribeSlowLogRecords',$sqlid);
             }
+            $slowData = $this->formatData($slowlog->run(),'DescribeSlowLogRecords');
+            if(!empty($slowData['data'])){
+            	$this->batchInsert($slowlog,$startstr,$endstr,$slowData['data'],'DescribeSlowLogRecords',$sqlid);
+            }
+
        }
        echo 'slowlogRecord succ'.PHP_EOL;
-       exit;
+    }
+
+    public function taskyield($slowlog,$startstr,$endstr){
+    	$generator = call_user_func(function() use($slowlog,$startstr,$endstr) {
+    		if($this->sql_id_arr){
+    			foreach ($this->sql_id_arr as $kk => $vv) {
+    				yield $this->Record($slowlog,$vv,$startstr,$endstr);
+    			}
+    		}	
+		});
+    	$slowlog->addGenerator($generator);
+    	$slowlog->run();
     }
 
     public function actionIndex($startstr='',$endstr=''){
@@ -127,9 +213,14 @@ class IndexController extends \yii\console\Controller
             for ($i=0; $i <$page_total-1; $i++) { 
                 $Page++;
                 echo 'slowlog获取第'.$Page.'页成功!'.PHP_EOL;
-                $this->pageData($Page,$PageSize,$startstr,$endstr,$slowlog);
+                $this->pageDataIN($Page,$PageSize,$startstr,$endstr,$slowlog);
+            }
+            $slowData = $this->formatData($slowlog->run());
+            if(!empty($slowData['data'])){
+            	$this->batchInsert($slowlog,$startstr,$endstr,$slowData['data'],'DescribeSlowLogs');
             }
        }
+       $this->taskyield($slowlog,$startstr,$endstr);
        echo 'slowlog succ'.PHP_EOL;
        exit;
     }
