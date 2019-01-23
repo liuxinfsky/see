@@ -14,14 +14,14 @@ class slowquery_slowlog extends \yii\db\ActiveRecord
     public static function getsqlid($sqlid)
     {
         if ($sqlid) {
-            return static::find()->where(['SQLId' => $sqlid])->One();
+            return static::find()->where(['SQLIdStr' => $sqlid])->One();
         } else {
             return [];
         }
     }
 
     public static function getsqlidexits($sqlidarr){
-        return array_map(function($record) { if($record->SQLId){ return $record->SQLId;}},static::find()->select('SQLId')->where(['in','SQLId',$sqlidarr])->all()) ? array_map(function($record) { if($record->SQLId){ return $record->SQLId;}},static::find()->select('SQLId')->where(['in','SQLId',$sqlidarr])->all()) : [];
+        return array_map(function($record) { if($record->SQLIdStr){ return $record->SQLIdStr;}},static::find()->select('SQLIdStr')->where(['in','SQLIdStr',$sqlidarr])->all()) ? array_map(function($record) { if($record->SQLIdStr){ return $record->SQLIdStr;}},static::find()->select('SQLIdStr')->where(['in','SQLIdStr',$sqlidarr])->all()) : [];
     }
 
     public static function batchInsert($data){
