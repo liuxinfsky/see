@@ -32,6 +32,9 @@
         server-id = 100  # 不限制具体数值<br/>
         log_bin = mysql-bin<br/>
         binlog_format = row  # 或 MIXED
+ - 由于有的表已存在数据，再添加索引或者字段需要工具
+     - 在docker里安装pt-online-schema-change来做实时改表结构<br/>
+       docker里执行yum install percona-toolkit
 
 
 ## 功能简介
