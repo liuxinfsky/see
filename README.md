@@ -26,6 +26,13 @@
     - `注意：上面的路径要替换成你的实际路径`
  - 登录账号
     - `登录账号：admin ,登录密码:111111`
+ - 使用回滚功能注意
+    - 目标库的设置要有
+        [mysqld]<br/>
+        server-id = 100  # 不限制具体数值<br/>
+        log_bin = mysql-bin<br/>
+        binlog_format = row  # 或 MIXED
+
 
 ## 功能简介
 
