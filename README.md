@@ -26,6 +26,16 @@
     - `注意：上面的路径要替换成你的实际路径`
  - 登录账号
     - `登录账号：admin ,登录密码:111111`
+ - 使用回滚功能注意
+    - 目标库的设置要有
+        [mysqld]<br/>
+        server-id = 100  # 不限制具体数值<br/>
+        log_bin = mysql-bin<br/>
+        binlog_format = row  # 或 MIXED
+ - 由于有的表已存在数据，再添加索引或者字段需要工具
+     - 在docker里安装pt-online-schema-change来做实时改表结构<br/>
+       docker里执行yum install percona-toolkit
+
 
 ## 功能简介
 
@@ -92,6 +102,9 @@
 
 ## 界面展示
 
+- 邮件提醒
+
+![image](https://github.com/myide/see/blob/master/frontend/src/images/github/mail.png)
 - Dashboard审计
 
 ![image](https://github.com/myide/see/blob/master/frontend/src/images/github/dashboard.png)
