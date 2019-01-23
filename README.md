@@ -102,6 +102,9 @@
 
 ## 界面展示
 
+- 邮件提醒
+
+![image](https://github.com/myide/see/blob/master/frontend/src/images/github/mail.png)
 - Dashboard审计
 
 ![image](https://github.com/myide/see/blob/master/frontend/src/images/github/dashboard.png)
