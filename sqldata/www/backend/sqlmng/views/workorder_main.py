@@ -23,7 +23,7 @@ class InceptionMainView(CheckStatusMixins, ActionMixins, MailMixin, BaseView):
     '''
     serializer_class = ListInceptionSerializer
     serializer_step = StepSerializer
-    # permission_classes = [IsAuthenticated, IsHandleAble]
+    permission_classes = [IsHandleAble]
     search_fields = ['commiter', 'sql_content', 'env', 'treater', 'remark']
 
     def get_serializer_class(self):
