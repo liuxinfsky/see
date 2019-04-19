@@ -96,7 +96,7 @@ class PersonalSerializer(AppellationMixins, serializers.ModelSerializer):
 
     def get_leader(self, env, instance):
         leader_obj = instance.leader if env == self.env_prd else instance
-        leader = {'id':leader_obj.id, 'username':leader_obj.username} if leader_obj else {}
+        leader = {'id':leader_obj.id, 'username':leader_obj.username, 'email':leader_obj.email} if leader_obj else {}
         return leader
 
     def get_db_list(self, instance):

@@ -144,8 +144,8 @@ class SqlQuery(HandleConn):
 
     def get_tables(self):
         sql = 'SHOW TABLES;'.format(self.db.name)
-        res = self.main(sql)
-        tables = [i[0] for i in res]
+        data = self.main(self.params, sql)[1]
+        tables = [i[0] for i in data]
         return tables
     def extract_table_name_from_sql(self,sql_str):
         q = re.sub(r"/\*[^*]*\*+(?:[^*/][^*]*\*+)*/", "", sql_str)
@@ -177,7 +177,7 @@ class SqlQuery(HandleConn):
 
     def get_table_info(self, table_name):
         sql = 'SHOW CREATE TABLE {}'.format(table_name)
-        table_info = self.main(sql)[0][1]
+        table_info = self.main(self.params, sql)[1][0][1]
         return table_info
 
     def cmd_res(self, cmd):
