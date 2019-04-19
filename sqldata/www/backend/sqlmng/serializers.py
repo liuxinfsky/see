@@ -1,19 +1,26 @@
 # -*- coding:utf-8 -*-
+import time
+from django.conf import settings
 from rest_framework import serializers
-from utils.basemixins import AppellationMixins, SetEncryptMixins
+from utils.basemixins import AppellationMixins,PromptMixins, SetEncryptMixins
 from .mixins import HandleInceptionSettingsMixins
 from .models import *
 
-class InceptionSerializer(serializers.ModelSerializer):
+class BaseInceptionSerializer(PromptMixins, serializers.ModelSerializer):
 
     admin = 'Admin'
     class Meta:
         model = Inceptsql
         fields = '__all__'
+    def get_email(self, treater):
+        email = User.objects.filter(username=treater).values_list('email',flat=True)
+        return '' if len(email)==0 else email[0]
 
     def get_step_user_group(self, user_instance):
-        group_name = user_instance.groups.first().name if user_instance and not user_instance.is_superuser else self.admin
-        return group_name
+        if not user_instance:
+            return self.admin
+        group_instance = user_instance.groups.first()
+        return group_instance.name if group_instance else user_instance.username
 
     def get_step(self, instance):
         data = []
@@ -35,10 +42,22 @@ class InceptionSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
-        ret = super(InceptionSerializer, self).to_representation(instance)
+        ret = super(BaseInceptionSerializer, self).to_representation(instance)
         ret['db_name'] = instance.db.name
         ret['steps'] = self.get_step(instance)
+        ret['email'] = self.get_email(instance.treater)
+        ret['cemail'] = self.get_email(instance.commiter)
         return ret
+
+class DetailInceptionSerializer(BaseInceptionSerializer):
+    pass
+
+class ListInceptionSerializer(BaseInceptionSerializer):
+
+    class Meta:
+        model = Inceptsql
+        exclude = ('handle_result', 'handle_result_check', 'handle_result_execute', 'handle_result_rollback')
+
 
 class DbSerializer(SetEncryptMixins, serializers.ModelSerializer):
 

@@ -39,13 +39,13 @@
             <p> <b>发起人：</b> </p>
           </Col>
           <Col span="10">
-            <p> {{row.commiter}} </p>
+            <p> {{row.cemail}} </p>
           </Col>
           <Col span="2">
             <p> <b>核准人：</b>  </p>
           </Col>
           <Col span="10">
-            <p> {{row.treater}} </p>
+            <p> {{row.email}} </p>
           </Col>
         </Row>
 
@@ -61,12 +61,16 @@
           </Col>
           <Col span="10">
             <p v-if="row.status == -4" > <Tag color="red">回滚失败</Tag> </p>
-            <p v-if="row.status == -3" > <Tag>已回滚</Tag> </p>
+            <p v-if="row.status == -3" > <Tag>回滚成功</Tag> </p>
             <p v-else-if="row.status == -2" > <Tag>已暂停</Tag> </p>
             <p v-else-if="row.status == -1" > <Tag color="blue">待执行</Tag> </p>
-            <p v-else-if="row.status == 0" > <Tag color="green">成功</Tag> </p>
+            <p v-else-if="row.status == 0" > <Tag color="green">执行成功</Tag> </p>
             <p v-else-if="row.status == 1" > <Tag color="yellow">已放弃</Tag> </p>
-            <p v-else-if="row.status == 2" > <Tag color="red">任务失败</Tag> </p>
+            <p v-else-if="row.status == 2" > <Tag color="red">任务异常</Tag> </p>
+            <p v-else-if="row.status == 3" > <Tag color="blue">审批通过</Tag> </p>
+            <p v-else-if="row.status == 4" > <Tag color="yellow">审批驳回</Tag> </p>
+            <p v-else-if="row.status == 5" > <Tag color="blue">已定时</Tag> </p>
+            <p v-else-if="row.status == 6" > <Tag color="blue">执行中</Tag> </p>
           </Col>
         </Row>
         <Row>
@@ -75,6 +79,26 @@
           </Col>
           <Col span="10">
             <p> {{row.remark}} </p>
+          </Col>
+          <Col span="2">
+            <p> <b>执行耗时：</b> </p>
+          </Col>
+          <Col span="10">
+            <p> {{row.execute_time}} s</p>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="2">
+            <p> <b>定时执行：</b> </p>
+          </Col>
+          <Col span="10">
+            <p> {{row.cron_time}} </p>
+          </Col>
+          <Col span="2">
+            <p> <b>执行错误：</b> </p>
+          </Col>
+          <Col span="10">
+            <p> {{row.execute_errors}}</p>
           </Col>
         </Row>
       </div>

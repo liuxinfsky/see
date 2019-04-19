@@ -20,8 +20,12 @@ class slowquery_slowlog extends \yii\db\ActiveRecord
         }
     }
 
-    public static function getsqlidexits($sqlidarr){
-        return array_map(function($record) { if($record->SQLIdStr){ return $record->SQLIdStr;}},static::find()->select('SQLIdStr')->where(['in','SQLIdStr',$sqlidarr])->all()) ? array_map(function($record) { if($record->SQLIdStr){ return $record->SQLIdStr;}},static::find()->select('SQLIdStr')->where(['in','SQLIdStr',$sqlidarr])->all()) : [];
+    public static function getsqlidexits($sqlidarr,$startstr='',$endstr=''){
+        if($startstr=='' && $endstr==''){
+          $startstr = date("Y-m-d");
+          $endstr = date("Y-m-d",strtotime("+1 day"));
+       }
+        return array_map(function($record) { if($record->SQLIdStr){ return $record->SQLIdStr;}},static::find()->select('SQLIdStr')->where(['and',['in','SQLIdStr',$sqlidarr],['>=','CreateTime',$startstr],['<=','CreateTime',$endstr]])->all()) ? array_map(function($record) { if($record->SQLIdStr){ return $record->SQLIdStr;}},static::find()->select('SQLIdStr')->where(['and',['in','SQLIdStr',$sqlidarr],['>=','CreateTime',$startstr],['<=','CreateTime',$endstr]])->all()) : [];
     }
 
     public static function batchInsert($data){

@@ -1,17 +1,19 @@
-import os, json
+# -*- coding: utf-8 -*-
+import os
+import json
 from django.conf import settings
 from rest_framework.views import APIView
+from rest_framework.exceptions import ParseError
 from django.http import StreamingHttpResponse
+from utils.basemixins import PromptMixins
 
 class RenderFile(object):
-
     path = settings.MEDIA.get('sql_file_path')
 
     def create_file(self, params, content):
         pk, sfx = params.get('pk'), params.get('sfx')
         file_name = '{}.{}'.format(pk, sfx)
-        isExists = os.path.exists(self.path)
-        if not isExists:
+        if not os.path.exists(self.path):
             os.makedirs(self.path)
         path = os.path.join(self.path, file_name)
         with open(path, 'w') as f:
@@ -35,13 +37,17 @@ class RenderFile(object):
                 else:
                     break
 
-class DownloadBaseView(RenderFile, APIView):
+class DownloadBaseView(PromptMixins, RenderFile, APIView):
 
-    def get_content(self):
-        return None
+    def check_content(self):
+        content = self.get_content()
+        if not content:
+            raise ParseError(self.get_content_fail)
+        return content
 
     def get(self, request, *args, **kwargs):
-        file_path, file_name = self.create_file(kwargs, self.get_content())
+        content = self.check_content()
+        file_path, file_name = self.create_file(kwargs, content)
         response = StreamingHttpResponse(self.file_iterator(file_path))
         response['Content-Type'] = 'application/octet-stream'
         response['Content-Disposition'] = 'attachment;filename="{0}"'.format(file_name)

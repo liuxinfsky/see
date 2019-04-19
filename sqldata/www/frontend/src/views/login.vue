@@ -90,12 +90,12 @@ export default {
             return str.replace(/(^\s*)|(\s*$)/g, ""); 
         },
         login (user, password) {
-            // if(this.trim(user)!='admin'){
-            //     this.$Message.error({
-            //         content: '非admin用户不允许登录',
-            //         duration: 5
-            //     });
-            // }else{
+            if(this.trim(user)!='admin'){
+                this.$Message.error({
+                    content: '非admin用户不允许登录',
+                    duration: 5
+                });
+            }else{
                 const data = { username: user, password: password }
                 Login(data)
                 .then(response => {
@@ -124,7 +124,7 @@ export default {
                     });
 
                 })
-            // }
+            }
         },
 
         Unified (user, password) {

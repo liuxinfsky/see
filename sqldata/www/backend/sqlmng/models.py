@@ -1,4 +1,4 @@
-#coding=utf-8
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from django.db import models
@@ -7,6 +7,11 @@ from django.contrib.auth.models import Group
 from utils.basemodels import Basemodel
 from workflow.models import Workorder
 # Create your models here.
+
+ENVS = (
+    ('prd', u'生产环境'),
+    ('test', u'测试环境')
+)
 
 class Cluster(Basemodel):
     class Meta:
@@ -31,16 +36,17 @@ class Dbconf(Basemodel):
 class Inceptsql(Basemodel):
     STATUS = (
         (-4, u'回滚失败'),
-        (-3, u'已回滚'),
+        (-3, u'回滚成功'),
         (-2, u'已暂停'),
         (-1, u'待执行'),
         (0, u'执行成功'),
         (1, u'已放弃'),
-        (2, u'任务失败'),
-    )
-    ENVS = (
-        ('prd', u'生产环境'),
-        ('test', u'测试环境')
+        (2, u'任务异常'),
+        (3, u'审批通过'),
+        (4, u'审批驳回'),
+        (5, u'已定时'),
+        (6, u'执行中'),
+        (7, u'回滚中')
     )
     users = models.ManyToManyField(User)
     group = models.ForeignKey(Group, null=True, blank=True, on_delete=models.CASCADE)
@@ -54,11 +60,13 @@ class Inceptsql(Basemodel):
     treater = models.CharField(max_length=64)
     status = models.IntegerField(default=-1, choices=STATUS)
     execute_errors = models.TextField(default='', null=True, blank=True)
-    exe_affected_rows = models.CharField(max_length=10, null=True, blank=True)
-    roll_affected_rows = models.CharField(max_length=10, null=True, blank=True)
+    execute_time = models.CharField(max_length = 32, null=True, blank=True)
+    rollback_time = models.CharField(max_length = 32, null=True, blank=True)
+    affected_rows = models.CharField(max_length=16, null=True, blank=True)
     rollback_opid = models.TextField(null=True, blank=True)
-    rollback_db = models.CharField(max_length=100, null=True, blank=True)
+    rollback_db = models.CharField(max_length=128, null=True, blank=True)
     rollback_able = models.BooleanField(default=False, verbose_name='可回滚')
+    cron_time = models.CharField(max_length=64, null=True, blank=True)
     handle_result = models.TextField(default='', null=True, blank=True, verbose_name='处理详情')
     handle_result_check = models.TextField(default='', null=True, blank=True, verbose_name='审核详情')
     handle_result_execute = models.TextField(default='', null=True, blank=True, verbose_name='执行详情')
@@ -71,6 +79,10 @@ class Suggestion(Basemodel):
 class Strategy(Basemodel):
     is_manual_review = models.BooleanField(default=False, verbose_name='有流程')
 
+class SqlSettings(Basemodel):
+    forbidden_words = models.TextField(null=True, blank=True, default='')
+    sql_count_limit = models.IntegerField(null=True, blank=True, default=1000)
+    
 class ForbiddenWords(Basemodel):
     forbidden_words = models.TextField(null=True, blank=True)
 
@@ -89,6 +101,7 @@ class AuthRules(Basemodel):
     env = models.CharField(max_length=8, choices=ENVS)
     reject = models.BooleanField()
     execute = models.BooleanField()
+    cron = models.BooleanField(default=False)
     rollback = models.BooleanField()
     approve = models.BooleanField()
     disapprove = models.BooleanField()
@@ -107,3 +120,19 @@ class InceptionConnection(Basemodel):
 class MailActions(Basemodel):
     value = models.BooleanField(default=False, verbose_name='是否发送')
     desc_cn = models.CharField(max_length=128, null=True, blank=True)
+
+class DatabaseWorkOrder(Basemodel):
+    STATUS = (
+        (0, u'待审核'),
+        (1, u'审核通过'),
+        (2, u'审核驳回'),
+        (3, u'放弃')
+    )
+    commiter = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, related_name='commiter')
+    treater = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE, related_name='treater')
+    status = models.IntegerField(default=0, choices=STATUS)
+    env = models.CharField(max_length=8, null=True, blank=True, choices=ENVS)
+    db_cluster = models.ForeignKey(Cluster, null=True, blank=True, on_delete=models.SET_NULL)
+    db_host = models.CharField(max_length=64, null=True, blank=True)
+    db_port = models.CharField(max_length=5, null=True, blank=True)
+    db_list = models.TextField(default='', null=True, blank=True)

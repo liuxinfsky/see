@@ -13,7 +13,7 @@
                                 <Col span="24" style="padding-left:6px;">
                                     <Row class-name="made-child-con-middle" type="flex" align="middle">
                                         <div>
-                                            <b class="card-user-infor-name" style="margin-left:50%">{{userInfo.username}}</b>
+                                            <b class="card-user-infor-name" style="margin-left:0%">{{userInfo.email}}</b>
                                             <p><span style="margin-right:20px">身份：{{identity}} </span> <span>属组：{{userInfo.group}} </span></p>
                                         </div>
                                     </Row>

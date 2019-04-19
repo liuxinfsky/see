@@ -11,9 +11,17 @@ export function GetSqlList(params) {
 }
 
 export function GetSqlDetail(id) {
-    return axios.get(inceptions + id);
+    return axios.get(inceptions + id + '/');
 }
 
 export function SqlAction(id, action) {
-    return axios.get(inceptions + id + '/' + action);
+    return axios.get(inceptions + id + '/' + action + '/');
+}
+
+export function SetCron (id, action, data) {
+    return axios({
+        url: inceptions + id + '/' + action + '/',
+        method: 'post',
+        data: data
+    });
 }

@@ -84,7 +84,7 @@
                     <p> <b>指定人：</b> </p>
                   </Col>
                   <Col span="10">
-                    <p> {{row.distributor}} </p>
+                    <p> {{row.distributor_email}} </p>
                   </Col>
                 </Row>
                  <Row>
@@ -92,7 +92,7 @@
                     <p> <b>执行人：</b> </p>
                   </Col>
                   <Col span="10">
-                    <p> {{row.executor}} </p>
+                    <p> {{row.executor_email}} </p>
                   </Col>
                   <Col span="2">
                     <p> <b>更新时间：</b> </p>

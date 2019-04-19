@@ -45,6 +45,13 @@ export const otherRouter = {
             component: () =>
                 import ('@/views/sql/slowlogDetail.vue'),
         }, // 慢查询
+        {
+            path: 'slowquerysql/:id',
+            title: '慢查询详细记录',
+            name: 'slowrecordList',
+            component: () =>
+                import ('@/views/sql/slowrecordList.vue')
+        }
     ]
 };
 

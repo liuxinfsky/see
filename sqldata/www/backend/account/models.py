@@ -12,7 +12,9 @@ class User(AbstractUser):
     leader = models.ForeignKey('User', null=True, blank=True, on_delete=models.CASCADE, related_name='leader_devs')
     admin_mail = models.ForeignKey('User', null=True, blank=True, on_delete=models.CASCADE, related_name='admin_devs')
     role = models.CharField(max_length=32, default='developer', choices=ROLES)
+    mail_list_extend = models.TextField(null=True, blank=True)
     remark = models.CharField(max_length=128, default='', blank=True)
+    phone = models.CharField(max_length=20, default='')
 
     class Meta:
         verbose_name_plural = u'用户'

@@ -38,7 +38,7 @@
             @on-cancel="cancel">
             <div>
               <Scroll height=450>
-                 <Form ref="createUserForm"  :label-width="100">
+                 <Form ref="createUserForm"  :label-width="100" :rules="ruleCheckData">
                   <Row>
                     <Col span="32">
                         <FormItem label="SQL语句：">
@@ -48,7 +48,7 @@
                     </Row>
                     <Row>
                     <Col span="32">
-                        <FormItem label="问题描述：">
+                        <FormItem label="问题描述：" prop="sql">
                           <i-input  v-model="formdata.content" type="textarea" :rows="4" placeholder="请输入问题描述..." ></i-input>
                         </FormItem>
                     </Col>
@@ -132,6 +132,9 @@
           executor:'',
           id:''
         },
+        ruleCheckData:{
+          sql:[{ required: true, message: '请输入问题描述', trigger: 'blur' }],
+        },
         stepsModal:false,
         stepsModalTitle:'',
         stepStatusMap:{
@@ -178,10 +181,10 @@
             sortMethod:function(a,b,type){
             },
             render: (h, params) => {
-              // return h('router-link', {props:{to:'/slowquerysql/'+params.row.SQLIdStr}}, params.row.id)
-              return h('div', [
-                h('span', {}, params.row.id),
-              ])
+              return h('router-link', {props:{to:'/slowquerysql/'+params.row.SQLIdStr}}, params.row.id)
+              // return h('div', [
+              //   h('span', {}, params.row.id),
+              // ])
             }
           },
 
@@ -231,10 +234,10 @@
             title: 'SQL查询语句',
             width: 300,
             render: (h, params) => {
-              // return h('router-link', {props:{to:'/slowquerysql/'+params.row.SQLIdStr}}, params.row.SQLText)
-              return h('div', [
-                h('span', {}, params.row.SQLText),
-              ])
+              return h('router-link', {props:{to:'/slowquerysql/'+params.row.SQLIdStr}}, params.row.SQLText)
+              // return h('div', [
+              //   h('span', {}, params.row.SQLText),
+              // ])
             }
               // return h('div', [
               //   h('span', {}, params.row.SQLText),

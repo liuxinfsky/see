@@ -41,11 +41,16 @@ class IndexController extends \yii\console\Controller
 
     private function composeInsertData(&$data,$slowtype,$slowlog='',$startstr='',$endstr='',$sqlids = ''){
         $sql_id_data=[];
+        $sqlid = [];
+        $data_tmp = [];
         $fields_slowlog=(new $this->slow_map[$slowtype]['class'])->attributes();
         $fields_slowlog && array_shift($fields_slowlog);
         if($data){
             foreach ($data as &$v) {
                 if ($slowtype=='DescribeSlowLogs'){
+                    if(date('Y-m-d',strtotime($v['CreateTime'])) != date('Y-m-d')){
+                      continue;
+                    }
                     $v['CreateTime'] = date('Y-m-d',strtotime($v['CreateTime']));
                     $sqlid[] = $v['SQLIdStr'] = $v['SQLHASH'];
                     $v['slow_status'] = 0;
@@ -61,7 +66,7 @@ class IndexController extends \yii\console\Controller
        }
        $sqlid && $sqlid = array_unique($sqlid);
         //去除重复数据
-        $sqlid && $sqlid_tmp = $this->slow_map[$slowtype]['class']::getsqlidexits($sqlid);
+        $sqlid && $sqlid_tmp = $this->slow_map[$slowtype]['class']::getsqlidexits($sqlid,$startstr,$endstr);
         $sqlid_diff = isset($sqlid_tmp) && $sqlid_tmp ? array_diff($sqlid,$sqlid_tmp) : $sqlid;
         if(isset($sqlid_diff)){
             foreach ($sqlid_diff as $m => $n) {
@@ -90,7 +95,7 @@ class IndexController extends \yii\console\Controller
 
     private function pageData($Page,$PageSize,$startstr,$endstr,$slowlog,$slowtype='DescribeSlowLogs'){
     	$taskUrl = $slowlog->setAction($slowtype)->setStartTime($startstr)->setEndTime($endstr)->setPageSize($PageSize)->setPageNumber($Page)->composeData();
-    	$result =$this->formatData($slowlog->addTask($taskUrl)->run(),$slowtype);
+    	$result =$this->formatData($slowlog->addTaskno($taskUrl),$slowtype);
         if(isset($result['data'])){
             echo $this->slow_map[$slowtype]['log'].'在第'.$Page.'页获取总条数为：'.count($result['data']).'条!'.PHP_EOL;
         }
@@ -147,7 +152,7 @@ class IndexController extends \yii\console\Controller
 
     private function pageRecordData($Page,$PageSize,$startstr,$endstr,$slowlog,$slowtype='DescribeSlowLogRecords',$sqlid){
        $taskUrl = $slowlog->setAction($slowtype)->setStartTime($startstr)->setEndTime($endstr)->setPageSize($PageSize)->setPageNumber($Page)->setSQLId($sqlid)->composeData();
-    	$result =$this->formatData($slowlog->addTaskId($taskUrl,$sqlid)->run(),$slowtype,$sqlid);
+    	$result =$this->formatData($slowlog->addTasknoId($taskUrl,$sqlid),$slowtype,$sqlid);
         if(isset($result['data'])){
             echo $this->slow_map[$slowtype]['log'].'在第'.$Page.'页获取总条数为：'.count($result['data']).'条!'.PHP_EOL;
         }
@@ -182,13 +187,14 @@ class IndexController extends \yii\console\Controller
 
        }
        echo 'slowlogRecord succ'.PHP_EOL;
+       return true;
     }
 
     public function taskyield($slowlog,$startstr,$endstr){
     	$generator = call_user_func(function() use($slowlog,$startstr,$endstr) {
     		if($this->sql_id_arr){
     			foreach ($this->sql_id_arr as $kk => $vv) {
-    				yield $this->Record($slowlog,$vv,$startstr,$endstr);
+    				yield $this->Record(new SlowlogService,$vv,$startstr,$endstr);
     			}
     		}	
 		});
@@ -197,6 +203,8 @@ class IndexController extends \yii\console\Controller
     }
 
     public function actionIndex($startstr='',$endstr=''){
+       ini_set('memory_limit', '256M');
+       date_default_timezone_set('PRC');
        $slowlog = new SlowlogService;
        if($startstr=='' && $endstr==''){
           $startstr = date("Y-m-d");
@@ -220,7 +228,7 @@ class IndexController extends \yii\console\Controller
             	$this->batchInsert($slowlog,$startstr,$endstr,$slowData['data'],'DescribeSlowLogs');
             }
        }
-       $this->taskyield($slowlog,$startstr,$endstr);
+       $this->taskyield(new SlowlogService,$startstr,$endstr);
        echo 'slowlog succ'.PHP_EOL;
        exit;
     }

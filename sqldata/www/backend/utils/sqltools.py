@@ -6,6 +6,7 @@ from rest_framework.exceptions import ParseError
 from django.conf import settings
 from .dbcrypt import prpcrypt
 from sqlmng.models import InceptionConnection
+import re
 
 class Inception(object):
 
@@ -33,7 +34,7 @@ class Inception(object):
             'passwd': conf.get('inception', 'inception_remote_system_password')
         }
 
-    def inception_handle(self, dbaddr):
+    def inception_handle(self, dbaddr,triggerstmp=''):
         status = 0
         sql = '/* {} */\
           inception_magic_start;\
@@ -41,6 +42,10 @@ class Inception(object):
         try:
             conn = pymysql.connect(user='', passwd='', db='', use_unicode=True, charset="utf8", **self.get_inception_conn)
             cur = conn.cursor()
+            if triggerstmp:
+                cur.execute("inception set inception_osc_on=0;")
+            else:
+                cur.execute("inception set inception_osc_on=1;")
             cur.execute(sql)
             result = cur.fetchall()
             cur.close()
@@ -80,26 +85,92 @@ class SoarParams(object):
     fingerprint = '-report-type=fingerprint'
     pretty = '-report-type=pretty'
 
-class SqlQuery(object):
+class HandleConn(object):
+
+    def __init__(self):
+        self.conn_conf = {
+            'use_unicode': True,
+            'charset': 'utf8'
+        }
+
+    @classmethod
+    def convert_params(cls, params):
+        params['port'] = int(params.get('port', 0))
+        return params
+
+    def main(self, params, sql, select=False):   # 查询目标库/表结构
+        params.update(self.conn_conf)
+        try:
+            params = self.convert_params(params)
+            conn = pymysql.connect(**params)
+            conn.autocommit(True)
+            cur = conn.cursor()
+            sqltmp = re.split(";",sql)
+            for item in sqltmp:
+                if item:
+                    cur.execute(item + ';')
+            conn.close()
+        except Exception as e:
+            if select:
+                return 2, [e]
+            raise ParseError(e)
+        return 0, cur.fetchall()
+
+class AutoQuery(HandleConn):
+
+    def get_databases(self, params):
+        sql = 'SHOW DATABASES;'
+        return self.main(params, sql)[1]
+
+    def conn_database(self, params):
+        sql = 'USE {}'.format(params.get('db'))
+        return self.main(params, sql)
+
+class SqlQuery(HandleConn):
 
     def __init__(self, instance):
+        super(SqlQuery, self).__init__()
         self.db = instance
         self.password = prpcrypt.decrypt(self.db.password)
         self.soar_cli = settings.OPTIMIZE_SETTINGS.get('soar_cli')
         self.sqladvisor_cli = settings.OPTIMIZE_SETTINGS.get('sqladvisor_cli')
-
-    def main(self, sql):
-        try:
-            conn = pymysql.connect(host=self.db.host, port=int(self.db.port), user=self.db.user, passwd=self.password, db=self.db.name, charset='utf8')
-            conn.autocommit(True)
-            cur = conn.cursor()
-            cur.execute(sql)
-        except Exception as e:
-            raise ParseError(e)
-        return cur.fetchall()
+        self.params = {
+            'host': self.db.host,
+            'port': self.db.port,
+            'user': self.db.user,
+            'passwd': self.password,
+            'db': self.db.name
+        }
 
     def get_tables(self):
         sql = 'SHOW TABLES;'.format(self.db.name)
+        res = self.main(sql)
+        tables = [i[0] for i in res]
+        return tables
+    def extract_table_name_from_sql(self,sql_str):
+        q = re.sub(r"/\*[^*]*\*+(?:[^*/][^*]*\*+)*/", "", sql_str)
+        lines = [line for line in q.splitlines() if not re.match("^\s*(--|#)", line)]
+        q = " ".join([re.split("--|#", line)[0] for line in lines])
+        tokens = re.split(r"[\s)(;]+", q)
+        result = set()
+        get_next = False
+        for token in tokens:
+            if get_next:
+                if token.lower() not in ["", "select"]:
+                    result.add(token)
+                get_next = False
+            get_next = token.lower() in ["from", "join","table","update","delete"]
+        return result
+
+    def get_select_result(self, sql):
+        data = self.main(self.params, sql, select=True)
+        return data
+
+    def get_triggers(self,table_name):
+        listdata = [str(item) for item in table_name]
+        table_name = "".join(listdata)
+        table_name = table_name.replace("`","")
+        sql = "SHOW triggers like '{}';".format(table_name)
         res = self.main(sql)
         tables = [i[0] for i in res]
         return tables

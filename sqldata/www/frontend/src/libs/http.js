@@ -68,6 +68,14 @@ axios.interceptors.response.use(
                     permerror(false, error.response.statusText, error.response.data.detail)
                     break
 
+                case 402:
+                    permerror(false,error.response.status, error.response.request.responseText)
+                    break
+                    
+                case 404:
+                    permerror(false,error.response.status, error.response.request.responseText)
+                    break
+
                 case 500:
                     permerror(false, error.response.status, error.response.statusText)
                     break

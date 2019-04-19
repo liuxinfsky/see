@@ -15,22 +15,6 @@ pymysql.install_as_MySQLdb()
 import os
 import datetime
 
-# CELERY
-import djcelery
-from celery import Celery, platforms
-platforms.C_FORCE_ROOT = True
-djcelery.setup_loader()
-BROKER_URL = 'redis://127.0.0.1:6379/0'  # redis broker
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'  # redis backend
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'America/Los_Angeles'
-CELERY_ENABLE_UTC = True
-CELERY_IMPORTS = ("utils.tasks",)
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 # swagger login/out
 LOGIN_URL = 'rest_framework:login'
 LOGOUT_URL = 'rest_framework:logout'
@@ -193,7 +177,7 @@ DATABASES = {
         'NAME': 'sqlweb',
         'USER': 'root',
         'PASSWORD': '123456',
-        'HOST':'192.168.2.74',
+        'HOST':'127.0.0.1',
         'PORT':'3306',
         'OPTIONS': {'charset':'utf8mb4'},
 	},
@@ -216,6 +200,29 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Lock
+LOCK = {
+    'host': '127.0.0.1',
+    'port': 6379,
+    'db': 3,
+    'timeout':600
+}
+
+# 邮件设置
+MAIL = {
+    'smtp_host': 'smtp.163.com',  # 邮件服务器
+    'smtp_port': 25,  # SMTP协议默认端口是25
+    'mail_user': 'sql_see@163.com',  # 邮件用户名
+    'mail_pass': 'see123',  # 授权码
+    'see_addr': 'http://xxx.xxx.xxx.xxx:81',  # see项目访问地址
+}
+
+# 钉钉设置
+DING = {
+    'ding_api': 'smtp.163.com',  # 钉钉机器人接口
+    'see_addr': 'http://xxx.xxx.xxx.xxx:81',  # see项目访问地址
+}
 
 # Media
 MEDIA = {
@@ -244,7 +251,105 @@ USE_I18N = True
 
 USE_L10N = True
 
+
+# CELERY
+import djcelery
+from celery import platforms
+from celery.schedules import crontab
+platforms.C_FORCE_ROOT = True
+djcelery.setup_loader()
+BROKER_URL = 'redis://127.0.0.1:6379/0'  # redis broker
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'  # redis backend
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Shanghai'
+CELERY_ENABLE_UTC = True
+CELERY_IMPORTS = ("utils.tasks",'sqlmng.tasks')
+CELERYBEAT_SCHEDULE = {
+    'cron_task': {
+        'task': 'sqlmng.tasks.cron_task',
+        'schedule': crontab(),
+    }
+}
+CELERY_BUSINESS_PARAMS = {
+    'username':'定时处理器',
+    'handle_type': 'execute',
+    'date_format': '%Y-%m-%d %H:%M'
+}
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+BASE_LOG_DIR = os.path.join(BASE_DIR, "logs")
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '[%(asctime)s][%(threadName)s:%(thread)d][task_id:%(name)s][%(filename)s:%(lineno)d]'
+                      '[%(levelname)s][%(message)s]'
+        },
+        'simple': {
+            'format': '[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d]%(message)s'
+        },
+        'collect': {
+            'format': '%(message)s'
+        }
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'default': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_LOG_DIR, "see.info.log"),
+            'maxBytes': 1024 * 1024 * 50,
+            'backupCount': 3,
+            'formatter': 'standard',
+            'encoding': 'utf-8',
+        },
+        'error': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_LOG_DIR, "see.error.log"),
+            'maxBytes': 1024 * 1024 * 50, 
+            'backupCount': 5,
+            'formatter': 'standard',
+            'encoding': 'utf-8',
+        },
+        'collect': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_LOG_DIR, "see.collect.log"),
+            'maxBytes': 1024 * 1024 * 50,
+            'backupCount': 5,
+            'formatter': 'collect',
+            'encoding': "utf-8"
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['default', 'console', 'error'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'collect': {
+            'handlers': ['console', 'collect'],
+            'level': 'INFO',
+        }
+    },
+}

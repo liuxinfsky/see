@@ -1,4 +1,4 @@
-#coding=utf8
+# -*- coding: utf-8 -*-
 import re
 from rest_framework.response import Response
 from rest_framework.exceptions import ParseError
@@ -6,16 +6,16 @@ from utils.baseviews import BaseView
 from utils.baseviews import ReturnFormatMixin as res
 from utils.basemixins import PromptMixins
 from workflow.serializers import WorkorderSerializer, StepSerializer
-from sqlmng.mixins import ChangeSpecialCharacterMixins, ActionMixins
+from sqlmng.mixins import ChangeSpecialCharacterMixins, ActionMixins, MailMixin
 from sqlmng.serializers import *
 from sqlmng.models import *
 
-class InceptionCheckView(PromptMixins, ChangeSpecialCharacterMixins, ActionMixins, BaseView):
+class InceptionCheckView(ChangeSpecialCharacterMixins, ActionMixins, MailMixin, BaseView):
     '''
         SQL语法审核
     '''
     queryset = Inceptsql.objects.all()
-    serializer_class = InceptionSerializer
+    serializer_class = DetailInceptionSerializer
     serializer_order = WorkorderSerializer
     serializer_step = StepSerializer
 
@@ -51,7 +51,7 @@ class InceptionCheckView(PromptMixins, ChangeSpecialCharacterMixins, ActionMixin
     def check_db(self, request_data):
         db = request_data.get('db')
         if not Dbconf.objects.filter(id=db):
-            raise ParseError({self.not_exists_target_db})
+            raise ParseError(self.not_exists_target_db)
 
     def create(self, request, *args, **kwargs):
         request_data = request.data
@@ -76,5 +76,5 @@ class InceptionCheckView(PromptMixins, ChangeSpecialCharacterMixins, ActionMixin
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         self.create_step(instance, request_data['users'])
-        self.mail(instance, self.action_type_check)
+        self.mail(instance, self.action_type_check, request.user,self.name_mail_inception)
         return Response(res.get_ret())

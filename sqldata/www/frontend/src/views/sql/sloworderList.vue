@@ -332,7 +332,7 @@
             width: 90,
             render: (h, params) => {
               return h('div', [
-                h('span', {}, params.row.distributor),
+                h('span', {}, params.row.distributor_email),
               ])
             }
           },
@@ -341,7 +341,7 @@
             width: 90,
             render: (h, params) => {
               return h('div', [
-                h('span', {}, params.row.executor),
+                h('span', {}, params.row.executor_email),
               ])
             }
           },

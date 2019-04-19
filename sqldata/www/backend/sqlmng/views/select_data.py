@@ -1,4 +1,4 @@
-#coding=utf8
+# -*- coding: utf-8 -*-
 from rest_framework.response import Response
 from utils.baseviews import BaseView
 from utils.baseviews import ReturnFormatMixin as res

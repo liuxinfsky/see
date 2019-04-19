@@ -82,7 +82,8 @@ import axios from '../../../libs/http';
 export default {
   props: ['row', 'handleResultCheck', 'handleResultExecute', 'handleResultRollback'],
   created() {
-    console.log(this.handleResultCheck, this.handleResultExecute, this.handleResultRollback)
+    this.tabName = this.row.type == 'select' ? 'handle_result_execute' : 'handle_result_check'
+    this.dataLength = this.row.type == 'select' ? this.handleResultExecute.length : this.handleResultCheck.length
   },
 
   data () {

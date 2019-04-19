@@ -8,6 +8,17 @@
 ![](https://img.shields.io/badge/python-3.6-brightgreen.svg)
 ![](https://img.shields.io/badge/Django-2.0-brightgreen.svg)
 
+### v2.0版本
+	v2.0版本是全新的版本，sql执行采用异步、定时执行等
+	v1.0版本要升级v2.0版本：
+		1、升级数据库使用sql/old/update.sql来升级数据库
+		2、sqldata/www下的所有文件覆盖（数据库配置相应的改一下）
+		3、进入docker(docker attach 容器id),vi /etc/rc.local
+			把nohup python manage.py celery worker -c 4 --loglevel=info >/dev/null 2>&1 &
+			修改为nohup python manage.py celery worker -c 10 -B --loglevel=info >/dev/null 2>&1 &
+		4、重启docker容器（docker restart 容器id）
+	注意：以后版本更新是在v2.0的基础上来迭代更新的，如果使用v1.0请进行升级，Master现为v2.0版本
+
 ### install
     进入docker目录
     docker build -t  sql:latest .

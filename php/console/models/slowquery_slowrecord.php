@@ -8,8 +8,12 @@ use yii\base\NotSupportedException;
 class slowquery_slowrecord extends \yii\db\ActiveRecord
 {
 
-	public static function getsqlidexits($sqlidarr){
-        return array_map(function($record) { if($record->SQLId){ return $record->SQLId;}},static::find()->select('SQLId')->where(['in','SQLId',$sqlidarr])->all()) ? array_map(function($record) { if($record->SQLId){ return $record->SQLId;}},static::find()->select('SQLId')->where(['in','SQLId',$sqlidarr])->all()) : [];
+	public static function getsqlidexits($sqlidarr,$startstr='',$endstr=''){
+        if($startstr=='' && $endstr==''){
+          $startstr = date("Y-m-d");
+          $endstr = date("Y-m-d",strtotime("+1 day"));
+       }
+        return array_map(function($record) { if($record->SQLId){ return $record->SQLId;}},static::find()->select('SQLId')->where(['and',['in','SQLId',$sqlidarr],['>=','ExecutionStartTime',$startstr],['<=','ExecutionStartTime',$endstr]])->all()) ? array_map(function($record) { if($record->SQLId){ return $record->SQLId;}},static::find()->select('SQLId')->where(['and',['in','SQLId',$sqlidarr],['>=','ExecutionStartTime',$startstr],['<=','ExecutionStartTime',$endstr]])->all()) : [];
     }
 
     public static function batchInsert($data){

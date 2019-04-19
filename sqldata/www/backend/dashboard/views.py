@@ -19,12 +19,13 @@ class ChartViewSet(BaseView):
     queryset = Inceptsql.objects.all()
     serializer_user = UserSerializer
     serializer_group = GroupSerializer
-    serializer_class = InceptionSerializer
+    serializer_class = ListInceptionSerializer
 
     def get_user_info(self):
         user_obj = self.request.user
         user_info = {}
         user_info['username'] = user_obj.username
+        user_info['email'] = user_obj.email
         user_info['date_joined'] = user_obj.date_joined
         user_info['group'] = user_obj.groups.first().name if user_obj.groups.first() else None
         user_info['identity'] = 'superuser' if user_obj.is_superuser else user_obj.role

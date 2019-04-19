@@ -460,10 +460,11 @@
 
       handleGetSqlList () {
         this.spinShow = true
-        this.getParams.sqlid=this.$route.params.sqlid
+        this.getParams.sqlid=this.$route.params.id
         GetSqlList(this.getParams)
         .then(response => {
           this.spinShow = false
+          console.log(response);
           this.sqlList = response.data.data
           this.total = response.data.counts
         })
