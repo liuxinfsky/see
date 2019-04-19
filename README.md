@@ -17,6 +17,8 @@
 			把nohup python manage.py celery worker -c 4 --loglevel=info >/dev/null 2>&1 &
 			修改为nohup python manage.py celery worker -c 10 -B --loglevel=info >/dev/null 2>&1 &
 		4、重启docker容器（docker restart 容器id）
+		5、此次更新包括定时执行、异步执行、（审核、提交、执行）邮件和钉钉提醒，需要配置
+			邮件（/sqldata/www/backend/utils/mail.py）和钉钉（/sqldata/www/backend/utils/ding.py），修复了pt由于触发器导致不能执行工单、修复多条执行导致的问题
 	注意：以后版本更新是在v2.0的基础上来迭代更新的，如果使用v1.0请进行升级，Master现为v2.0版本
 
 ### install
