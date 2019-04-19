@@ -4,18 +4,18 @@
 <template>
     <div>
       <div style="margin-top:10px;margin-bottom:10px">
-        <Row>
+        <Row style="line-height:30px;">
           <Col span="2">
             <p> <b>ID：</b> </p>
           </Col>
           <Col span="10">
-            <p> {{row.id}} </p>
+            <p> {{row.id ? row.id : '&nbsp;'}} </p>
           </Col>
           <Col span="2">
             <p> <b>目标库：</b>  </p>
           </Col>
           <Col span="10">
-            <p> {{row.db_name}} </p>
+            <p> {{row.db_name ? row.db_name : '&nbsp;'}} </p>
           </Col>
         </Row>
 
@@ -30,7 +30,7 @@
             <p> <b>影响的行数：</b>  </p>
           </Col>
           <Col span="10">
-            <p> {{row.exe_affected_rows}} </p>
+            <p> {{row.exe_affected_rows ? row.exe_affected_rows : '&nbsp;' }} </p>
           </Col>
         </Row>
 
@@ -39,13 +39,13 @@
             <p> <b>发起人：</b> </p>
           </Col>
           <Col span="10">
-            <p> {{row.cemail}} </p>
+            <p> {{row.cemail ? row.cemail : '&nbsp;' }} </p>
           </Col>
           <Col span="2">
             <p> <b>核准人：</b>  </p>
           </Col>
           <Col span="10">
-            <p> {{row.email}} </p>
+            <p> {{row.email ? row.email : '&nbsp;'}} </p>
           </Col>
         </Row>
 
@@ -78,13 +78,13 @@
             <p> <b>备注：</b> </p>
           </Col>
           <Col span="10">
-            <p> {{row.remark}} </p>
+            <p> {{row.remark ? row.remark : '&nbsp;'}} </p>
           </Col>
           <Col span="2">
             <p> <b>执行耗时：</b> </p>
           </Col>
           <Col span="10">
-            <p> {{row.execute_time}} s</p>
+            <p> {{row.execute_time ? row.execute_time : '&nbsp;'}} s</p>
           </Col>
         </Row>
         <Row>
@@ -92,13 +92,13 @@
             <p> <b>定时执行：</b> </p>
           </Col>
           <Col span="10">
-            <p> {{row.cron_time}} </p>
+            <p> {{row.cron_time ? row.cron_time : '&nbsp;' }} </p>
           </Col>
           <Col span="2">
             <p> <b>执行错误：</b> </p>
           </Col>
           <Col span="10">
-            <p> {{row.execute_errors}}</p>
+            <p> {{row.execute_errors ? row.execute_errors : '&nbsp;' }}</p>
           </Col>
         </Row>
       </div>

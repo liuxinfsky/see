@@ -114,6 +114,7 @@
           treater:'',
           commiter:'',
           users:[],
+          treater_email:''
         },
         commiter:{},
         ruleCheckData:{
@@ -183,12 +184,14 @@
         if (JSON.stringify(treater) != "{}") {
           this.checkData.treater = treater.id
           this.checkData.treater_username = treater.username
+          this.checkData.treater_email = treater.email
         }
       },
 
       treaterClear(){
         this.checkData.treater_username = ''
         this.checkData.treater = ''
+        this.checkData.treater_email = ''
       },
 
       handleSelect (e) {
@@ -234,7 +237,7 @@
               let data = response.data.data
               let msg = response.data.msg
               if (status == 0){
-                this.renderFunc(this.checkData.treater_username, 'SQL工单 已提交')          
+                this.renderFunc(this.checkData.treater_email, 'SQL工单 已提交')          
               } else if (status == -1 || status == -2){
                 this.warning('SQL审核不通过', msg)
               } 
