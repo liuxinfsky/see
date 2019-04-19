@@ -75,7 +75,7 @@
                   <TimePicker format="HH:mm" placeholder="选择时间" style="width: 112px" v-model="cronForm.time"></TimePicker>
                 </FormItem>
                 <FormItem label="说明:">
-                  <div>管理员可以对审批通过的工单设置定时，到时间将自动执行</div>
+                  <div>核准人通过的工单设置定时，到时间将自动执行</div>
                 </FormItem>                
               </Form> 
             </div>
@@ -120,7 +120,7 @@
           time:'',
         },
         ruleCronForm: {
-          time: [{ required: true, message: '时间不能为空', trigger: 'blur' }],          
+          time: [{ required:true, message: '时间不能为空' }],          
         },
         steps:[],
         stepsModal:false,
@@ -398,7 +398,7 @@
         SetCron(id, action, data)
         .then(response => {
           const status = response.data.status
-          if (status == 0) {
+          if (status == 5) {
             this.alertCronSet(id, data.cron_time)
           }
           this.handleGetSqlList()

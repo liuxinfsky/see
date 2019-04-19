@@ -17,3 +17,5 @@ CREATE TABLE `sqlmng_sqlsettings` (
 INSERT INTO `account_user`(`password`,`last_login`,`is_superuser`,`username`,`first_name`,`last_name`,`email`,`is_staff`,`is_active`,`date_joined`,`remark`,`leader_id`,`admin_mail_id`,`phone`,`mail_list_extend`) VALUES ('', '0', '定时处理器', '', '', '', '0', '1', '2019-04-17 11:48:19.724211', 'developer', '', null, null, '', null);
 INSERT INTO `sqlmng_mailactions`(`name`,`createtime`,`updatetime`,`remark`,`value`,`desc_cn`) VALUES ('select', '2019-04-18 17:24:04.000000', '2019-04-18 17:24:09.000000', null, '0', '查询');
 UPDATE `sqlmng_mailactions` SET name = 'execute' WHERE desc_cn = '执行';
+UPDATE `sqlmng_authrules` SET cron = 1 WHERE is_manual_review = 1 AND role = 'admin' AND env = 'prd';
+UPDATE `sqlmng_authrules` SET cron = 1 WHERE is_manual_review = 0 AND role != 'developer' AND env = 'prd';
