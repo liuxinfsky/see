@@ -105,5 +105,15 @@ class ConnectionCheckView(CheckConn, APIView):
         检查连接(Inception连接/Inception备份库/目标库)
     '''
     def post(self, request, *args, **kwargs):
-        res = self.check(request)
-        return Response(res)
+        check_type = request.data.pop('check_type')
+        func = getattr(CheckConn, check_type)
+        ret = func(self, request)
+        return Response(ret)
+
+class ShowDatabasesView(CheckConn, APIView):
+    '''
+        获取host地址的所有数据库
+    '''
+    def post(self, request, *args, **kwargs):
+        ret = self.handle_get_databases(request)
+        return Response(ret)

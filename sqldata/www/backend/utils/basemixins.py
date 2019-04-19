@@ -92,10 +92,10 @@ class SetEncryptMixins(object):
     def create(self, validated_data):
         password = validated_data.get(self.parameter)
         validated_data[self.parameter] = prpcrypt.encrypt(password)
-        return super(SetEncryptMixin, self).create(validated_data)
+        return super(SetEncryptMixins, self).create(validated_data)
 
     def update(self, instance, validated_data):
         password = validated_data.get(self.parameter)
         if password != instance.password:
             validated_data[self.parameter] = prpcrypt.encrypt(password)
-        return super(SetEncryptMixin, self).update(instance, validated_data)
+        return super(SetEncryptMixins, self).update(instance, validated_data)

@@ -19,7 +19,7 @@
           </Col>
         </Row>
 
-        <Row>
+        <Row style="line-height:30px;">
           <Col span="2">
             <p> <b>提交时间：</b> </p>
           </Col>
@@ -34,7 +34,7 @@
           </Col>
         </Row>
 
-        <Row>
+        <Row style="line-height:30px;">
           <Col span="2">
             <p> <b>发起人：</b> </p>
           </Col>
@@ -49,7 +49,7 @@
           </Col>
         </Row>
 
-        <Row>
+        <Row style="line-height:30px;">
           <Col span="2">
             <p> <b>环境：</b> </p>
           </Col>
@@ -73,7 +73,7 @@
             <p v-else-if="row.status == 6" > <Tag color="blue">执行中</Tag> </p>
           </Col>
         </Row>
-        <Row>
+        <Row style="line-height:30px;">
           <Col span="2">
             <p> <b>备注：</b> </p>
           </Col>
@@ -87,7 +87,7 @@
             <p> {{row.execute_time ? row.execute_time : '&nbsp;'}} s</p>
           </Col>
         </Row>
-        <Row>
+        <Row style="line-height:30px;">
           <Col span="2">
             <p> <b>定时执行：</b> </p>
           </Col>
