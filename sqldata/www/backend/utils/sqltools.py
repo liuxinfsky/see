@@ -171,7 +171,7 @@ class SqlQuery(HandleConn):
         table_name = "".join(listdata)
         table_name = table_name.replace("`","")
         sql = "SHOW triggers like '{}';".format(table_name)
-        res = self.main(sql)
+        res = self.main(self.params, sql)[1]
         tables = [i[0] for i in res]
         return tables
 
