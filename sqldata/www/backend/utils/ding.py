@@ -6,8 +6,8 @@ import time
 
 class Ding(object):
 
-    ding_api = "https://oapi.dingtalk.com/robot/send?access_token=dc6912a5a787a6d28d6a30c3775d4f8f674db6215d77a58a2e7b9d70ddc33e78"  # 设置钉钉机器人api
-    see_addr = 'https://sqlaudit.julive.com'  # see项目访问地址
+    ding_api = "https://oapi.dingtalk.com/robot/send?access_token"  # 设置钉钉机器人api
+    see_addr = 'https://www.test.com'  # see项目访问地址
     @classmethod
     def print_log(cls,log):
         file_obj = open('/home/test.log', 'a+')
