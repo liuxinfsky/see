@@ -8,9 +8,9 @@ class Mail(object):
 
     smtp_host = "smtp.exmail.qq.com"  # 设置服务器
     smtp_port = 465  # SMTP协议默认端口是25
-    mail_user = "system@comjia.com"  # 用户名
-    mail_pass = "RfUvW2cgdCCTkxYe"  # 授权码
-    see_addr = 'https://sqlaudit.julive.com'  # see项目访问地址
+    mail_user = "test@test.com"  # 用户名
+    mail_pass = "1111111"  # 授权码
+    see_addr = 'https://www.test.com'  # see项目访问地址
     '''
         修改邮件配置: sqlweb/settings.py
     '''
