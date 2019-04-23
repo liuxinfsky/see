@@ -310,7 +310,7 @@
             return
           }
           const data = {
-            check_type: 'create_target_db',
+            //check_type: 'create_target_db',
             host:this.createDbForm.host,
             port:this.createDbForm.port,
             user:this.createDbForm.user,
