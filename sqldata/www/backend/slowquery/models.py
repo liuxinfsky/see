@@ -1,10 +1,9 @@
 from django.db import models
-
+from account.models import User
 # Create your models here.
 class SlowLog(models.Model):
 	ParseMaxRowCount = models.IntegerField()
 	MySQLTotalExecutionCounts = models.IntegerField()
-	SQLId = models.BigIntegerField()
 	SQLText = models.TextField()
 	MaxLockTime = models.IntegerField()
 	ReturnTotalRowCounts = models.IntegerField()
@@ -20,7 +19,7 @@ class SlowLog(models.Model):
 	slow_status = models.IntegerField(default = 0)
 
 class SlowRecord(models.Model):
-	SQLId = models.BigIntegerField()
+	SQLId = models.CharField(max_length = 50,default = '')
 	ReturnRowCounts = models.IntegerField()
 	HostAddress = models.CharField(max_length = 100,default = '')
 	SQLText = models.TextField()
