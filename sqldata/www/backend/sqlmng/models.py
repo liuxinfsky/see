@@ -136,3 +136,15 @@ class DatabaseWorkOrder(Basemodel):
     db_host = models.CharField(max_length=64, null=True, blank=True)
     db_port = models.CharField(max_length=5, null=True, blank=True)
     db_list = models.TextField(default='', null=True, blank=True)
+class DbTableCount(models.Model):
+    db_name = models.CharField(max_length=80, null=True, blank=True,default='')
+    table_name = models.CharField(max_length=150, null=True, blank=True,default='')
+    counter = models.IntegerField(null=True, blank=True, default=0)
+    table_info = models.TextField(null=True, blank=True)
+    table_comment = models.CharField(max_length=200, null=True, blank=True,default='')
+    incrementer = models.IntegerField(null=True, blank=True, default=0)
+    yesincrementer = models.IntegerField(null=True, blank=True, default=0)
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    update_time = models.DateTimeField(auto_now=True, verbose_name='修改时间')
+    class Meta:
+        ordering = ['-counter']

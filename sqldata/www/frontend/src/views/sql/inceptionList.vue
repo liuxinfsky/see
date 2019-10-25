@@ -210,9 +210,9 @@
           },
 
           {
-            title: '定时执行时间',
-            width: 120,
-            key:'cron_time'
+            title: '目标库',
+            width: 80,
+            key:'db_name'
           },
 
           {
@@ -480,7 +480,7 @@
                 break
               }
             }
-            console.log(this.sqlList)
+            // console.log(this.sqlList)
           }
         })
       },

@@ -8,6 +8,13 @@
 ![](https://img.shields.io/badge/python-3.6-brightgreen.svg)
 ![](https://img.shields.io/badge/Django-2.0-brightgreen.svg)
 
+###v2.0.1版本
+    新添加对数据库表的统计以及增量统计
+    1、执行script里的python脚本(根据自己需要改里面配置)
+    2、重启docker
+    3、效果图
+![](https://github.com/qieangel2013/see/tree/master/sqldata/www/frontend/dist/dist/table.png)
+
 ### v2.0版本
 	v2.0版本是全新的版本，sql执行采用异步、定时执行等
 	v1.0版本要升级v2.0版本：

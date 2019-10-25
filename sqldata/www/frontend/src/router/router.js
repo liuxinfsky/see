@@ -135,6 +135,13 @@ export const appRouter = [{
                     import ('@/views/sql/check.vue')
             },
             {
+                path: 'dbCountList',
+                title: '数据库表统计',
+                name: 'dbCountList',
+                component: () =>
+                    import ('@/views/sql/dbCountList.vue')
+            },
+            {
                 path: 'inceptionList',
                 title: '工单处理',
                 name: 'inceptionList',

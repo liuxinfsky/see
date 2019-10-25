@@ -9,6 +9,7 @@ from .views.workorder_main import InceptionMainView
 from .views.auth_rules import AuthRulesViewSet
 from .views.suggestion import SuggestionViewSet
 from .views.db_cluster import DbClusterViewSet
+from .views.dbtablecount import DbTableCountSet
 from .views.settings import \
     ForbiddenWordsViewSet, \
     StrategyViewSet, \
@@ -33,6 +34,7 @@ router.register(r'dbcluster', DbClusterViewSet, base_name='DbClusterViewSet')
 router.register(r'mailactions', MailActionsSettingsViewSet, base_name='MailActionsSettingsViewSet')
 router.register(r'inception/variables', InceptionVariablesViewSet, base_name='InceptionVariablesViewSet')
 router.register(r'inception/connection', InceptionConnectionViewSet, base_name='InceptionConnectionViewSet')
+router.register(r'dbtablecount', DbTableCountSet, base_name='DbTableCountSet')
 
 urlpatterns = [
     url(r'^', include(router.urls)),

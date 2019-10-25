@@ -1,8 +1,17 @@
 import axios from '../../libs/http';
 const dbConfs = '/api/sqlmng/dbconfs/';
+const dbtablecount = '/api/sqlmng/dbtablecount/';
 
 export function GetTableList(id) {
     return axios.get(dbConfs + id + '/tables/');
+}
+
+export function GetDbTableCount (params) {
+    return axios({
+        url: dbtablecount,
+        method: 'get',
+        params
+    });
 }
 
 export function GetTableInfo(id, tableName) {

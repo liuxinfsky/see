@@ -345,7 +345,7 @@ class MailMixin(AppellationMixins):
                 mailto_users = list(set(mailto_users))
                 mailto_list = [u.email for u in User.objects.filter(username__in = mailto_users)]
                 atuser = [u.phone for u in User.objects.filter(username = treater)]
-                send_mail(mailto_list, user.email, sqlobj.id, sqlobj.remark, mail_type, sqlobj.sql_content, sqlobj.db.name,atuser)
+                send_mail(mailto_list, personnel.email, sqlobj.id, sqlobj.remark, mail_type, sqlobj.sql_content, sqlobj.db.name,atuser)
         except Exception as e:
             print(e)
 

@@ -118,11 +118,31 @@ class PersonalSerializer(AppellationMixins, serializers.ModelSerializer):
                 db_list.append(row)
         return db_list
 
+    def get_all_db_list(self, instance):
+        db_queryset = Dbconf.objects.all()
+        db_list = []
+        if db_queryset:
+            for db in db_queryset:
+                cluster = db.cluster
+                if not cluster:continue
+                cluster_id = cluster.id
+                cluster_name = cluster.name
+                row = {
+                    'id': db.id,
+                    'name': db.name,
+                    'env': db.env,
+                    'cluster_id': cluster_id,
+                    'cluster_name': cluster_name,
+                }
+                db_list.append(row)
+        return db_list
+
     def to_representation(self, instance):
         env = self.context['request'].GET.get('env')
         ret = super(PersonalSerializer, self).to_representation(instance)
         ret['leader'] = self.get_leader(env, instance)
         ret['db_list'] = self.get_db_list(instance)
+        ret['all_db_list'] = self.get_all_db_list(instance)
         ret['commiter'] = self.get_commiter(instance)
         return ret
 
@@ -175,4 +195,9 @@ class MailActionsSettingsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MailActions
+        fields = '__all__'
+class DbTableCountSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DbTableCount
         fields = '__all__'

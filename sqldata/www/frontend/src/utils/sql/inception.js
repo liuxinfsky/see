@@ -14,7 +14,7 @@ export function getSqlContent (sqlContent) {
             }else{
               if(sqltmp[i].replace(/(^\s*)|(\s*$)/g, "") != ''){
                   sqlContent.push({
-                    value:sqltmp[i] + ';',
+                    value:sqltmp[i],
                 })
               }
             }
